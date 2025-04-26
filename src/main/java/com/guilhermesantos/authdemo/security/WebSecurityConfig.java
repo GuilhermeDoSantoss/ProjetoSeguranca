@@ -21,6 +21,7 @@ public class WebSecurityConfig {
                .authorizeHttpRequests( (auth) -> {
                   auth.requestMatchers(new AntPathRequestMatcher("/hello", "GET")).permitAll()
                           .requestMatchers(new AntPathRequestMatcher("/login", "POST")).permitAll()
+                          .requestMatchers(new AntPathRequestMatcher("/users", "POST")).permitAll()
                           .anyRequest().authenticated();
                })
                 .addFilterBefore(new AuthFilter(), UsernamePasswordAuthenticationFilter.class);
