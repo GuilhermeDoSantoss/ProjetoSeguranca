@@ -27,7 +27,7 @@ public class UserServiceImpl implements IUserService{
         User res = repo.findByLogin(dto.login());
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         if (encoder.matches(dto.password(), res.getPassword())){
-            return TokenUtil.encode(dto);
+            return TokenUtil.encode(res);
         }
         return null;
     }

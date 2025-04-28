@@ -22,6 +22,9 @@ public class WebSecurityConfig {
                   auth.requestMatchers(new AntPathRequestMatcher("/hello", "GET")).permitAll()
                           .requestMatchers(new AntPathRequestMatcher("/login", "POST")).permitAll()
                           .requestMatchers(new AntPathRequestMatcher("/users", "POST")).permitAll()
+                          .requestMatchers(new AntPathRequestMatcher("/user", "GET")).hasRole("USER")
+                          .requestMatchers(new AntPathRequestMatcher("/admin", "GET")).hasRole("ADMIN")
+                          .requestMatchers(new AntPathRequestMatcher("/master", "GET")).hasRole("MASTER")
                           .anyRequest().authenticated();
                })
                 .addFilterBefore(new AuthFilter(), UsernamePasswordAuthenticationFilter.class);

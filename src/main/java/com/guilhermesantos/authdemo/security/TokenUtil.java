@@ -1,6 +1,7 @@
 package com.guilhermesantos.authdemo.security;
 
 import com.guilhermesantos.authdemo.dto.LoginDTO;
+import com.guilhermesantos.authdemo.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
@@ -9,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.apache.tomcat.util.http.parser.Authorization;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import javax.crypto.SecretKey;
 import java.security.Key;
@@ -21,12 +23,13 @@ public class TokenUtil {
     public static final long EXPIRATION = 24*30*1000;
     public static final String SECRET_KEY = "0123456789012345678901234567890123456789";
 
-    public static AuthToken encode(LoginDTO dadosLogin){
+    public static AuthToken encode(User dadosLogin){
         try{
             Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
             String jwtToken = Jwts.builder()
-                    .subject(dadosLogin.login())
+                    .subject(dadosLogin.getLogin())
                     .issuer(EMISSOR)
+                    .claim("ROLE", "ROLE_" +dadosLogin.getRole())
                     .expiration(new Date(System.currentTimeMillis() + EXPIRATION))
                     .signWith(key)
                     .compact();
@@ -50,9 +53,11 @@ public class TokenUtil {
                 String subject = claims.getSubject();
                 String issuper = claims.getIssuer();
                 Date   exp      = claims.getExpiration();
+                String role = claims.get("ROLE").toString();
 
                 if (issuper.equals(EMISSOR) && subject.length() > 0 && exp.after(new Date(System.currentTimeMillis()))){
-                    Authentication auth = new UsernamePasswordAuthenticationToken("usuario", null, Collections.emptyList());
+                    Authentication auth =
+                            new UsernamePasswordAuthenticationToken(subject, null, Collections.singletonList(new SimpleGrantedAuthority(role)));
                     return auth;
                 }
 
